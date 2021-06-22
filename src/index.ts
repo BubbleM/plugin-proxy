@@ -5,7 +5,7 @@ import { createProxyMiddleware } from 'http-proxy-middleware';
 import { TProxyOptions } from './type/index';
 
 const defaultOptions = {
-  prefix: '/proxy',
+  prefix: '/api',
   proxyTimeout: 10000,
   router: () => { }
 }
@@ -48,7 +48,7 @@ export default (uma: Uma, option: TProxyOptions = defaultOptions): Koa.Middlewar
           proxyReq.setHeader('iswap', 'true');
         }
 
-        const { body } = ctx.request;
+        const { body = {} } = ctx.request;
 
         if (req.method === 'POST' && JSON.stringify(body) !== '{}') {
           const bodyData = JSON.stringify(body);
