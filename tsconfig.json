@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2017",
+    "noImplicitAny": false,
+    "sourceMap": false,
+    "rootDir": "./src",
+    "outDir": "./lib",
+    "watch": false,
+    "alwaysStrict": true,
+    "removeComments": true,
+    "preserveWatchOutput": true,
+    "experimentalDecorators": true,
+    "declaration": true
+  },
+  "include": ["src/**/*.ts"]
+}
