@@ -44,8 +44,3 @@ module.exports = {
    }
 #### timeout
 > 网关超时时间，单位毫秒，默认 10000 毫秒
-
-/**
-  1. ${ROOT}/config/config.js 可以指定配置目录的具体文件地址 文件维护网关中心配置
-  2. option 通过option参数维护网关中心配置
-*/
