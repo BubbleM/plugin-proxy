@@ -1,6 +1,6 @@
 {
   "name": "@umajs/plugin-proxy",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "代理转发插件",
   "main": "lib/index.js",
   "scripts": {
