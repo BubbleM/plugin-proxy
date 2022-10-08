@@ -56,10 +56,22 @@ export default (uma: Uma, options: TProxyOptions = {
           return path.replace(ProxyReg, '')
         },
         onProxyReq(proxyReq, req) {
-          if (req["BODYDATA"]) { // 重新写入body data
-            proxyReq.setHeader('Content-Type', 'application/json; charset=utf-8');
-            proxyReq.setHeader('Content-Length', Buffer.byteLength(req["BODYDATA"]));
-            proxyReq.write(req["BODYDATA"]);
+          let BODYDATA = req["BODYDATA"] || {};
+          if (JSON.stringify(BODYDATA) !== '{}') { // 如果使用koa-body解析了参数需要重新写入body data
+            let originContenType: string = <string>proxyReq.getHeader('Content-Type') || '';
+            if (originContenType.indexOf('form') !== -1) { // 处理form类型
+              let body = BODYDATA;
+              let urlWithParams = '';
+              for (let key in body) {
+                urlWithParams += `${key}=${body[key]}&`
+              }
+              proxyReq.setHeader('Content-Length', Buffer.byteLength(urlWithParams));
+              proxyReq.write(urlWithParams);
+            } else {
+              proxyReq.setHeader('Content-Type', 'application/json; charset=utf-8');
+              proxyReq.setHeader('Content-Length', Buffer.byteLength(JSON.stringify(BODYDATA)));
+              proxyReq.write(JSON.stringify(BODYDATA));
+            }
             proxyReq.end();
           }
 
@@ -70,7 +82,7 @@ export default (uma: Uma, options: TProxyOptions = {
             logger.info(JSON.stringify({
               action: 'proxy',
               url: req.originalUrl,
-              message: `转发代理成功,${proxyRes.statusCode}! 请求参数${req.method === 'POST' ? req["BODYDATA"] : 'GET'}`,
+              message: `转发代理成功,${proxyRes.statusCode}! 请求参数${req.method === 'POST' ? JSON.stringify(req["BODYDATA"]) : 'GET'}`,
               reqConf: {
                 method: req.method,
                 targetOrigin: req["targetOrigin"],
@@ -81,7 +93,7 @@ export default (uma: Uma, options: TProxyOptions = {
             logger.error(JSON.stringify({
               action: 'proxy',
               url: req.originalUrl,
-              message: `转发代理成功，响应异常,${proxyRes.statusCode}!${proxyRes.statusMessage} 请求参数${req.method === 'POST' ? req["BODYDATA"] : 'GET'}`,
+              message: `转发代理成功，响应异常,${proxyRes.statusCode}!${proxyRes.statusMessage} 请求参数${req.method === 'POST' ? JSON.stringify(req["BODYDATA"]) : 'GET'}`,
               reqConf: {
                 method: req.method,
                 targetOrigin: req["targetOrigin"],
@@ -113,7 +125,7 @@ export default (uma: Uma, options: TProxyOptions = {
       async handler(ctx: IContext, next: Function) {
         const { body = {} } = ctx.request;
         if (ctx.req.method === 'POST' && JSON.stringify(body) !== '{}') {
-          ctx.req['BODYDATA'] = JSON.stringify(body);
+          ctx.req['BODYDATA'] = body;
         }
 
         try {

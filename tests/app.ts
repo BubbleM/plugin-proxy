@@ -9,7 +9,7 @@ shell.ln('-sf', path.resolve(__dirname, '../src'), path.resolve(__dirname, './pl
 
 const uma = Uma.instance({
   Router,
-  bodyParser: { multipart: false, urlencoded: false },
+  bodyParser: { multipart: false },
   ROOT: __dirname,
   env: process.argv.indexOf('production') > -1 ? 'production' : 'development',
 });
