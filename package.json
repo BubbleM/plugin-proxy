@@ -1,6 +1,6 @@
 {
   "name": "@umajs/plugin-proxy",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "代理转发插件",
   "main": "lib/index.js",
   "scripts": {
@@ -16,7 +16,8 @@
     "@umajs/logger": "^2.0.0",
     "http-proxy-middleware": "^2.0.0",
     "jsonwebtoken": "^8.5.1",
-    "koa2-connect": "^1.0.2"
+    "koa2-connect": "^1.0.2",
+    "qs": "^6.11.0"
   },
   "devDependencies": {
     "@types/koa": "^2.13.3",

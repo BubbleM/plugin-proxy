@@ -3,6 +3,7 @@ import * as k2c from 'koa2-connect';
 import Uma, { IContext, TPlugin } from '@umajs/core';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { UmaLogger } from '@umajs/logger';
+import * as Qs from 'qs';
 
 const { ROOT } = Uma.options;
 
@@ -60,13 +61,9 @@ export default (uma: Uma, options: TProxyOptions = {
           if (JSON.stringify(BODYDATA) !== '{}') { // 如果使用koa-body解析了参数需要重新写入body data
             let originContenType: string = <string>proxyReq.getHeader('Content-Type') || '';
             if (originContenType.indexOf('form') !== -1) { // 处理form类型
-              let body = BODYDATA;
-              let urlWithParams = '';
-              for (let key in body) {
-                urlWithParams += `${key}=${body[key]}&`
-              }
-              proxyReq.setHeader('Content-Length', Buffer.byteLength(urlWithParams));
-              proxyReq.write(urlWithParams);
+              let formData = Qs.stringify(BODYDATA);
+              proxyReq.setHeader('Content-Length', Buffer.byteLength(formData));
+              proxyReq.write(formData);
             } else {
               proxyReq.setHeader('Content-Type', 'application/json; charset=utf-8');
               proxyReq.setHeader('Content-Length', Buffer.byteLength(JSON.stringify(BODYDATA)));
@@ -82,7 +79,7 @@ export default (uma: Uma, options: TProxyOptions = {
             logger.info(JSON.stringify({
               action: 'proxy',
               url: req.originalUrl,
-              message: `转发代理成功,${proxyRes.statusCode}! 请求参数${req.method === 'POST' ? JSON.stringify(req["BODYDATA"]) : 'GET'}`,
+              message: `转发代理成功,${proxyRes.statusCode}! 请求类型${req.method}`,
               reqConf: {
                 method: req.method,
                 targetOrigin: req["targetOrigin"],
@@ -93,7 +90,7 @@ export default (uma: Uma, options: TProxyOptions = {
             logger.error(JSON.stringify({
               action: 'proxy',
               url: req.originalUrl,
-              message: `转发代理成功，响应异常,${proxyRes.statusCode}!${proxyRes.statusMessage} 请求参数${req.method === 'POST' ? JSON.stringify(req["BODYDATA"]) : 'GET'}`,
+              message: `转发代理成功，响应异常,${proxyRes.statusCode}!${proxyRes.statusMessage} 请求类型${req.method}`,
               reqConf: {
                 method: req.method,
                 targetOrigin: req["targetOrigin"],
